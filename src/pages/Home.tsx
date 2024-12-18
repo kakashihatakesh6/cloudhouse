@@ -10,14 +10,14 @@ const Home = () => {
   const chartOptions = [
     {
       id: 'main',
-      title: 'Multi-Country Comparison',
+      title: 'Multi-Country Comparison - (Uplot)',
       description: 'Compare COVID-19 metrics across multiple countries simultaneously',
       icon: '🌍',
       component: NewChartMain
     },
     {
       id: 'demo',
-      title: 'Detailed Country Analysis',
+      title: 'Detailed Country Analysis - (Recharts)',
       description: 'In-depth analysis of COVID-19 metrics for individual countries',
       icon: '📊',
       component: DemoChartPage
@@ -35,7 +35,7 @@ const Home = () => {
             className="max-w-6xl mx-auto"
           >
             <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-              COVID-19 Dashboard Visualizations
+              COVID-19 Visualizations
             </h1>
             <div className="grid md:grid-cols-2 gap-6">
               {chartOptions.map((option) => (
