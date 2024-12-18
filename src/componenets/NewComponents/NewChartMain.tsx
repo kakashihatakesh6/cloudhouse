@@ -10,9 +10,6 @@ const MOCK_DATA = [
     { country: 'Brazil', id: 9, metric: 'Deaths', time: '2020-01-01T00:00:00Z', value: 15 }
 ]
 
-const METRICS = ['Cases', 'New Cases', 'Deaths']
-const COUNTRIES = ['Brazil', 'USA', 'India', 'UK', 'France']
-
 export default function NewChartMain() {
     const chartRef = useRef<HTMLDivElement>(null)
     const [startDate, setStartDate] = useState('2020-01-01')
@@ -20,56 +17,89 @@ export default function NewChartMain() {
     const [selectedCountry, setSelectedCountry] = useState('Brazil')
     const [selectedMetric, setSelectedMetric] = useState('Cases')
     const [data, setData] = useState(MOCK_DATA)
+    const [countries, setCountries] = useState<string[]>([])  // Ensure it's typed as string[]
+    const [metrics, setMetrics] = useState<string[]>([])  // Ensure it's typed as string[]
     const [error, setError] = useState('')
-    const [refetch, setRefetch] = useState(false)
-    console.log("data , metric, selected", data, selectedMetric, selectedCountry)
 
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_HOST}/api/covid/getdata`);
-            if (!response) throw new Error('Failed to fetch data')
-            const newData = await response.data;
-            console.log("neww data =>", newData)
-            if (newData.length === 0) {
-                setError('No data available for the selected criteria.')
-                setData([])
-            } else {
-                setData(newData)
-                setError('')
-                setRefetch(true)
+            // Ensure REACT_APP_HOST is defined in your .env file
+            const host = process.env.REACT_APP_HOST;
+            if (!host) {
+                throw new Error("API host is not defined. Make sure REACT_APP_HOST is set in your environment.");
             }
-        } catch (err) {
-            setError('Failed to fetch data. Showing mock data.')
-            setData(MOCK_DATA)
-        }
-    }
-    useEffect(() => {
-        fetchData()
-    }, [])
 
-
-    useEffect(() => {
-        const fetchFilterData = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_HOST}/api/covid/getfiltered?metric=${selectedMetric}&country=${selectedCountry}&startDate=${startDate}&endDate=${endDate}`);
-                if (!response) throw new Error('Failed to fetch data')
-                const newData = await response.data;
-                console.log("neww data =>", newData)
+            const response = await axios.get(`${host}/api/covid/getdata`);
+            
+            // Check if the response is valid and has the expected data structure
+            if (response && response.data) {
+                const newData = response.data;
+                
                 if (newData.length === 0) {
                     setError('No data available for the selected criteria.')
                     setData([])
                 } else {
                     setData(newData)
                     setError('')
+
+                    // Dynamically set countries and metrics based on fetched data
+                    const uniqueCountries: string[] = Array.from(new Set(newData.map((item: { country: any }) => item.country)))
+                    const uniqueMetrics: string[] = Array.from(new Set(newData.map((item: { metric: any }) => item.metric)))
+
+                    setCountries(uniqueCountries)
+                    setMetrics(uniqueMetrics)
+
+                    // Set the initial filter values based on the fetched data
+                    setSelectedCountry(uniqueCountries[0])
+                    setSelectedMetric(uniqueMetrics[0])
+                }
+            } else {
+                throw new Error("Invalid response format from the API.");
+            }
+        } catch (err) {
+            // Handle errors and show appropriate messages
+            setError('Failed to fetch data. Showing mock data.')
+            setData(MOCK_DATA)
+            console.error(err)
+        }
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [])
+
+    useEffect(() => {
+        const fetchFilterData = async () => {
+            try {
+                const host = process.env.REACT_APP_HOST;
+                if (!host) {
+                    throw new Error("API host is not defined. Make sure REACT_APP_HOST is set in your environment.");
+                }
+
+                const response = await axios.get(`${host}/api/covid/getfiltered?metric=${selectedMetric}&country=${selectedCountry}&startDate=${startDate}&endDate=${endDate}`);
+                console.log("res =>", response)
+                // Check if the response is valid and has the expected data structure
+                if (response && response.data) {
+                    const newData = response.data;
+                    if (newData.length === 0) {
+                        setError('No data available for the selected criteria.')
+                        setData([])
+                    } else {
+                        setData(newData)
+                        setError('')
+                    }
+                } else {
+                    throw new Error("Invalid response format from the API.");
                 }
             } catch (err) {
                 setError('Failed to fetch data. Showing mock data.')
                 setData(MOCK_DATA)
+                console.log(err)
             }
         }
-        if (refetch) {
-            fetchFilterData()
-        }
+
+        // Fetch data whenever the filters change
+        fetchFilterData()
     }, [startDate, endDate, selectedCountry, selectedMetric])
 
     useEffect(() => {
@@ -145,9 +175,9 @@ export default function NewChartMain() {
                         onChange={(e) => setSelectedCountry(e.target.value)}
                         className="w-full p-2 border rounded"
                     >
-                        {data.map(item => (
-                            <option key={item.id} value={item.country}>
-                                {item.country}
+                        {countries.map(country => (
+                            <option key={country} value={country}>
+                                {country}
                             </option>
                         ))}
                     </select>
@@ -159,7 +189,7 @@ export default function NewChartMain() {
                         onChange={(e) => setSelectedMetric(e.target.value)}
                         className="w-full p-2 border rounded"
                     >
-                        {METRICS.map(metric => (
+                        {metrics.map(metric => (
                             <option key={metric} value={metric}>
                                 {metric}
                             </option>
@@ -178,4 +208,3 @@ export default function NewChartMain() {
         </div>
     )
 }
-
