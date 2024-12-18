@@ -198,13 +198,14 @@ export default function NewChartMain() {
                 </div>
             </div>
 
-            {error && (
+            {/* {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded mb-4">
                     {error}
                 </div>
-            )}
-
+            )} */}
+        
             <div ref={chartRef} className="bg-white p-4 rounded border" />
+
         </div>
     )
 }
