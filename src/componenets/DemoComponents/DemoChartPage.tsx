@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { format, parse } from 'date-fns';
-import { mockData } from '../../utils/MockData';
+import { genMockData } from '../../utils/MockData';
 import DateRangePicker from './date-range-picker';
 
 // Lazy load the CovidChart component
@@ -11,13 +11,13 @@ const metrics = ['Total Cases', 'New Cases', 'Deaths'];
 
 export default function DemoChartPage() {
   const [dateRange, setDateRange] = useState({
-    from: parse(mockData[0].date, 'yyyy-MM-dd', new Date()),
-    to: parse(mockData[mockData.length - 1].date, 'yyyy-MM-dd', new Date()),
+    from: parse(genMockData[0].date, 'yyyy-MM-dd', new Date()),
+    to: parse(genMockData[genMockData.length - 1].date, 'yyyy-MM-dd', new Date()),
   });
   const [selectedCountry, setSelectedCountry] = useState(countries[0]);
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>(['Total Cases']);
 
-  const filteredData = mockData.filter((d) => {
+  const filteredData = genMockData.filter((d) => {
     const date = parse(d.date, 'yyyy-MM-dd', new Date());
     return (
       date >= dateRange.from &&

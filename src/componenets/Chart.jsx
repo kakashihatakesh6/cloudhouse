@@ -10,8 +10,10 @@ const Chart = ({ data, metric }) => {
   useEffect(() => {
     if (!Array.isArray(data) || data.length === 0 || !chartRef.current) return;
 
+    // Extract unique countries
     const countries = [...new Set(data.map((d) => d.country))];
 
+    // Define series for each country
     const series = [
       { label: 'Date', value: (u, v) => new Date(v * 1000).toLocaleDateString() },
       ...countries.map((country) => ({
@@ -21,25 +23,30 @@ const Chart = ({ data, metric }) => {
       })),
     ];
 
-    const timestamps = [...new Set(data.map((d) => new Date(d.timestamp).getTime() / 1000))].sort();
+    // Extract unique timestamps and sort them
+    const timestamps = [...new Set(data.map((d) => new Date(d.time).getTime() / 1000))].sort();
+
+    // Prepare data for plotting
     const plotData = [
       timestamps,
       ...countries.map((country) =>
-        timestamps.map((t) =>
-          data.find((d) => d.country === country && new Date(d.timestamp).getTime() / 1000 === t)?.[metric] ?? null
-        )
+        timestamps.map((t) => {
+          const point = data.find((d) => d.country === country && new Date(d.time).getTime() / 1000 === t && d.metric === metric);
+          return point ? point.value : null;
+        })
       ),
     ];
 
+    // Chart options
     const opts = {
       width: chartRef.current.clientWidth,
       height: 400,
-      title: `COVID-19 ${metric.replace('_', ' ').toUpperCase()}`,
+      title: `${metric} Over Time`,
       series,
       scales: { x: { time: true }, y: { auto: true } },
       axes: [
         { scale: 'x', label: 'Date' },
-        { scale: 'y', label: metric.replace('_', ' ').toUpperCase() },
+        { scale: 'y', label: metric },
       ],
       hooks: {
         setCursor: [
@@ -56,9 +63,11 @@ const Chart = ({ data, metric }) => {
       },
     };
 
+    // Initialize the uPlot instance
     const newUPlotInstance = new uPlot(opts, plotData, chartRef.current);
     setUPlotInstance(newUPlotInstance);
 
+    // Handle resizing
     const resizeObserver = new ResizeObserver(() => {
       newUPlotInstance.setSize({ width: chartRef.current.clientWidth, height: 400 });
     });
@@ -74,6 +83,7 @@ const Chart = ({ data, metric }) => {
   return <div ref={chartRef} style={{ width: '100%', maxWidth: '800px', height: '400px', margin: '0 auto' }}></div>;
 };
 
+// Utility function to generate random colors
 function getRandomColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
 }

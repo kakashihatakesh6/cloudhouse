@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainChart from '../componenets/MainChart';
 import DemoChartPage from '../componenets/DemoComponents/DemoChartPage';
+import NewChartMain from '../componenets/NewComponents/NewChartMain';
 
 const Home = () => {
   const [selectedChart, setSelectedChart] = useState<string | null>(null);
@@ -12,7 +13,7 @@ const Home = () => {
       title: 'Multi-Country Comparison',
       description: 'Compare COVID-19 metrics across multiple countries simultaneously',
       icon: '🌍',
-      component: MainChart
+      component: NewChartMain
     },
     {
       id: 'demo',
@@ -81,7 +82,7 @@ const Home = () => {
                 <span>Back to Selection</span>
               </motion.button>
               
-              {selectedChart === 'main' ? <MainChart /> : <DemoChartPage />}
+              {selectedChart === 'main' ? <NewChartMain /> : <DemoChartPage />}
             </div>
           </motion.div>
         )}

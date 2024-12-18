@@ -35,11 +35,11 @@ export function generateMockData(numMonths: number): DataPoint[] {
         'Brazil': 0.7,
         'France': 0.4,
         'Germany': 0.4,
-        'UK': 0.4,
-        'Italy': 0.3,
-        'Spain': 0.3,
-        'Japan': 0.3,
-        'Canada': 0.2
+        // 'UK': 0.4,
+        // 'Italy': 0.3,
+        // 'Spain': 0.3,
+        // 'Japan': 0.3,
+        // 'Canada': 0.2
       }[country] || 0.5;
 
       const baseCases = 500000 * countryMultiplier;
@@ -59,5 +59,6 @@ export function generateMockData(numMonths: number): DataPoint[] {
   return data
 }
 
-export const mockData = generateMockData(36) // 3 years of monthly data
+// export const mockData = generateMockData(36) // 3 years of monthly data
+export const genMockData = generateMockData(36) // 3 years of monthly data
 

@@ -48,11 +48,11 @@ export const CountrySelector = ({
       <div className="mt-1 h-4 text-xs text-gray-500">
         {selectedCountries.length > 0 && (
           <span>
-            {selectedCountries.length} {selectedCountries.length === 1 ? 'country' : 'countries'} selected
+            {selectedCountries.length}{' '}
+            {selectedCountries.length === 1 ? 'country' : 'countries'} selected
           </span>
         )}
       </div>
     </div>
   );
 };
-
